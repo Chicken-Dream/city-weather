@@ -1,6 +1,10 @@
 const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 const CITY_STORAGE_KEY = 'metar-app-city-v1';
 
+const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? ''
+  : 'https://city-weather-api.city-weather.workers.dev';
+
 const DEFAULT_CITY = {
   name: 'Koror',
   admin1: '',
@@ -117,7 +121,7 @@ function toggleFavorite(city) {
 }
 
 function getMetarUrl() {
-  return `/api/metar?ids=${encodeURIComponent(currentCity.icaoId)}`;
+  return `${API_BASE}/api/metar?ids=${encodeURIComponent(currentCity.icaoId)}`;
 }
 
 function getOpenMeteoUrl() {
@@ -166,7 +170,7 @@ async function findNearestStation(lat, lon) {
   for (const delta of radii) {
     const bbox = [lat - delta, lon - delta, lat + delta, lon + delta].map((n) => n.toFixed(2)).join(',');
     try {
-      const res = await fetch(`/api/stations?bbox=${encodeURIComponent(bbox)}`);
+      const res = await fetch(`${API_BASE}/api/stations?bbox=${encodeURIComponent(bbox)}`);
       if (!res.ok) continue;
       const data = await res.json();
       if (!Array.isArray(data) || data.length === 0) continue;
