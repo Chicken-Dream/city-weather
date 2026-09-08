@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather</title>
+<link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+<link rel="manifest" href="favicon/site.webmanifest">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="weather-bg" id="weather-bg">
+  <div class="layer" id="layer-sky"></div>
+  <div class="layer" id="layer-moon">
+    <div class="stars" id="stars"></div>
+    <div class="moon"></div>
+  </div>
+  <div class="layer" id="layer-sun">
+    <div class="sun-rays"></div>
+    <div class="sun-core"></div>
+  </div>
+  <div class="layer" id="layer-clouds">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+  </div>
+  <div class="layer" id="layer-fog">
+    <div class="fog-band fog-1"></div>
+    <div class="fog-band fog-2"></div>
+  </div>
+  <div class="layer" id="layer-rain"></div>
+  <div class="layer" id="layer-snow"></div>
+  <div class="layer" id="layer-lightning">
+    <div class="flash"></div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+</div>
+
+<div class="city-panel hidden" id="city-panel">
+  <div class="city-panel-inner">
+    <h3>Change City</h3>
+    <div class="favorites-section hidden" id="favorites-section">
+      <h4 class="favorites-heading">Favourites</h4>
+      <div class="favorites-list" id="favorites-list"></div>
+    </div>
+    <form id="city-search-form">
+      <input type="text" id="city-search-input" placeholder="Search for a city&hellip;" autocomplete="off">
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <p class="city-status" id="city-status"></p>
+    <div class="city-results" id="city-results"></div>
+    <button class="btn btn-ghost" id="city-cancel-btn">Cancel</button>
+  </div>
+</div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">&#9992;</span>
+      <div>
+        <h1 id="city-name">Weather</h1>
+        <span class="subtitle" id="city-subtitle"></span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost btn-star" id="favorite-toggle-btn" title="Add to favourites" aria-pressed="false">☆</button>
+      <button class="btn btn-ghost" id="city-change-btn">Change City</button>
+      <button class="btn btn-ghost" id="refresh-btn">Refresh</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="error-banner hidden" id="error-banner">
+      <span id="error-text"></span>
+      <button class="btn btn-ghost" id="retry-btn">Retry</button>
+    </div>
+
+    <div class="weather-card" id="weather-card">
+      <div class="primary-row">
+        <div class="condition-icon" id="condition-icon">&#9728;&#65039;</div>
+        <div class="temp-block">
+          <div class="temp-value" id="temp-value">--&deg;</div>
+          <div class="condition-label" id="condition-label">Loading&hellip;</div>
+        </div>
+        <div class="fltcat-badge hidden" id="fltcat-badge"></div>
+      </div>
+
+      <div class="feels-like hidden" id="feels-like"></div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <span class="stat-label">Humidity</span>
+          <span class="stat-value" id="stat-humidity">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Wind</span>
+          <span class="stat-value" id="stat-wind">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Visibility</span>
+          <span class="stat-value" id="stat-visibility">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Pressure</span>
+          <span class="stat-value" id="stat-pressure">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Dewpoint</span>
+          <span class="stat-value" id="stat-dewpoint">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Cloud Cover</span>
+          <span class="stat-value" id="stat-clouds">--</span>
+        </div>
+      </div>
+
+      <div class="meta-row">
+        <span id="last-updated">Last updated: --</span>
+        <button class="link-btn" id="raw-toggle">Show raw METAR</button>
+      </div>
+      <pre class="raw-metar hidden" id="raw-metar"></pre>
+
+      <button class="btn btn-block" id="today-toggle">View Today's Weather</button>
+    </div>
+
+    <div class="weather-card today-card hidden" id="today-card">
+      <div class="today-header">
+        <h2 id="today-city-label">Today</h2>
+        <span id="today-date"></span>
+      </div>
+      <div class="hilo-row">
+        <div class="hilo"><span class="stat-label">High</span><span class="stat-value" id="today-high">--</span></div>
+        <div class="hilo"><span class="stat-label">Low</span><span class="stat-value" id="today-low">--</span></div>
+        <div class="hilo"><span class="stat-label">Average</span><span class="stat-value" id="today-avg">--</span></div>
+      </div>
+      <canvas id="today-chart" height="140"></canvas>
+      <p class="chart-note">Grey = already passed &middot; green = current hour &middot; dashed = forecast (Open-Meteo). Past &amp; current hours are real METAR observations.</p>
+      <div class="today-grid" id="today-grid"></div>
+
+      <button class="btn btn-block" id="weekly-toggle">View 2-Week Outlook</button>
+    </div>
+
+    <div class="weather-card weekly-card hidden" id="weekly-card">
+      <div class="today-header">
+        <h2>2-Week Outlook</h2>
+        <span>Sun&ndash;Sat, this week &amp; next</span>
+      </div>
+      <div class="weekly-grid" id="weekly-grid"></div>
+      <p class="chart-note">Daily highs/lows from Open-Meteo. Past days reflect recorded conditions; future days are forecasts.</p>
+    </div>
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
